@@ -1,8 +1,6 @@
 #! /usr/bin/env bash
 
 SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-# TODO: Need to add kommune.no since NORID removed it from whois
-# while it is still a  kategory domain.
 WHOIS="${SOURCE_DIR}/NNRI4O-NORID.whois"
 
 if [ ! -e "${WHOIS}" ]; then
