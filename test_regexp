@@ -1,0 +1,128 @@
+#! /usr/bin/env bash
+SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+cd "${SOURCE_DIR}"
+
+function err() { echo "$@" 1>&2; }
+
+
+# Input has to be cut to be valid will return a cut (valid) version
+function assert_equal_comp {
+    IN="$1";
+    EXPOUT="$2";
+    GOTOUT="$(echo "$IN" | ./regexp_dotno)";
+    
+    if [ "${EXPOUT}" != "${GOTOUT}" ]; then
+        EXPLEN="$(echo -n "${EXPOUT}" | wc -c)"
+        GOTLEN="$(echo -n "${GOTOUT}" | wc -c)"
+        echo "[ERROR] Input '${IN}', expected '${EXPOUT}' (${EXPLEN}), got '${GOTOUT}' (${GOTLEN})";
+    fi
+}
+
+# Input is a valid domain will return the same as input
+function assert_equal {
+    assert_equal_comp "$1" "$1";
+}
+
+
+# Input that can not be cut to a valid domain returns nothing
+function assert_empty {
+    IN="$1";
+    GOTOUT="$(echo "$IN" | ./regexp_dotno)";
+    
+    if [ "%" != "%${GOTOUT}" ]; then
+        GOTLEN="$(echo -n "${GOTOUT}" | wc -c)"
+        echo "[ERROR] Input '${IN}', expected '', got '${GOTOUT} (${GOTLEN})'";
+    fi
+}
+
+# Check that maxlen is 63
+assert_equal "maaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-exactly-62.no"
+assert_equal "maaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-exactly-63.no"
+assert_equal "maaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-exactly-63.oslo.no"
+assert_equal_comp "wmaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-64-cut-to-63.no" "maaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-64-cut-to-63.no"
+assert_equal_comp "wmaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-64-cut-to-63.oslo.no" "maaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-64-cut-to-63.oslo.no"
+assert_equal_comp "wwwwwwwwwwwwwwwwmaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-80-cut-to-63.no" "maaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-80-cut-to-63.no"
+assert_equal_comp "wwwwwwwwwwwwwwwwmaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-80-cut-to-63.oslo.no" "maaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-80-cut-to-63.oslo.no"
+
+# Check that - is not permitted, either at start or end
+assert_equal_comp "---foo.oslo.no" "foo.oslo.no"
+assert_equal_comp "foo-.oslo.no" "oslo.no"
+assert_equal_comp "-foo-.oslo.no" "oslo.no"
+assert_empty "-o.no"
+assert_empty "o-.no"
+assert_empty "-o-.no"
+
+# Check that domains can't be one char 
+assert_empty "l.no"
+assert_empty "-.no"
+assert_empty "1.no"
+
+# Check some legal hyphens
+assert_equal "0--o.no"
+assert_equal "0----------------o.no"
+assert_equal "0-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o.no"
+
+# Check that subdomains of category domains can be 1 char (oslo is category domain)
+assert_equal "m.oslo.no"
+assert_equal "mm.oslo.no"
+assert_equal "mmm.oslo.no"
+assert_equal_comp "det.er.m.oslo.no" "m.oslo.no" 
+assert_equal_comp "m.m.m.oslo.no" "m.oslo.no"
+
+# Check some weird category domains
+assert_equal "www.gs.of.no"
+assert_equal "foobar.sande.more-og-romsdal.no"
+assert_equal "www.xn--hery-ira.xn--mre-og-romsdal-qqb.no"
+assert_equal "våler.østfold.no"
+assert_equal "sør-trøndelag.no"
+assert_equal "ákŋoluokta.no"
+
+# Test some numbers
+assert_equal "1ákŋo2.no"
+assert_equal "112.no"
+assert_equal "99999999.no"
+
+# Test some strings that will return multiple domains
+assert_equal_comp "det.er.no.sol.no" "er.no
+sol.no"
+assert_equal_comp " det.er.no.sol.no" "er.no
+sol.no"
+assert_equal_comp "det.er.no.sol.no" "er.no
+sol.no"
+assert_equal_comp "det.er.no.oslo.no" "er.no
+oslo.no"
+assert_equal_comp "det.er.no.m.oslo.no" "er.no
+m.oslo.no"
+assert_equal_comp "oslo.no,sol.no" "oslo.no
+sol.no"
+assert_equal_comp "det.er.no.m.m.oslo.no.m.e.no" "er.no
+m.oslo.no"  # oslo is category domain
+
+# Test some domains with noise around them
+assert_equal_comp "02inan.norsknettskole.no:80" "norsknettskole.no"
+assert_equal_comp "02klho.norsknettskole.no/pages" "norsknettskole.no"
+assert_equal_comp "02klho.norsknettskole.no/pages" "norsknettskole.no"
+
+assert_equal "no.no"
+assert_equal "øl.no"
+assert_equal "lo.no"
+assert_equal "lol.no"
+assert_equal "o-a.no"
+assert_equal "foobarfoooo.oslo.no"
+
+assert_equal "02600.no"
+assert_equal_comp "02bjli.norsknettskole.no" "norsknettskole.no"
+
+assert_equal "0330.no"
+assert_equal "123førstehjelp.no"
+assert_equal_comp "02bat.norwegianbroker.no" "norwegianbroker.no"
+assert_equal_comp "123ror.no123ferdig.no" "no123ferdig.no"
+assert_equal_comp "123ror.rrno123ferdig.no" "rrno123ferdig.no"
+assert_equal "1sol.no"
+assert_equal "sol1.no"
+assert_equal_comp "123ror.no123ferdig.no" "no123ferdig.no"
+assert_equal "123áàäčçđéèêŋń-ñóòôöšŧüžæøå123.no"
+assert_empty "1c.nov.ru"
+
+echo "[INFO] All tests complete"

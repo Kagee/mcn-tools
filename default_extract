@@ -1,0 +1,13 @@
+#! /usr/bin/env bash
+SCRIPT_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
+if [ -t 0 ] ; then
+    if [ "$#" -ne 1 ]; then
+        echo "No STDIN input detected (non-terminal), and no file argument supplied"
+        exit 1;
+    fi
+    echo "INFO: Reading data from '$1'." 1>&2
+    $SCRIPT_DIR/regexp_dotno "$1" | $SCRIPT_DIR/tolower | sort | uniq;
+else
+    echo "INFO: Reading data from stdin." 1>&2
+    $SCRIPT_DIR/regexp_dotno | $SCRIPT_DIR/tolower | sort | uniq;
+fi

@@ -1,0 +1,48 @@
+#! /usr/bin/env bash
+
+SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+#
+#  For usage, see ./test_regexp
+#
+
+# Valid chars: 
+# https://www.norid.no/en/domeneregistrering/idn/idn_nyetegn/
+VCHAR_EX_DASH='[a-z0-9\x{C5}\x{C6}\x{D8}\x{E0}\x{E1}\x{E4}-\x{EA}\x{F1}-\x{F4}\x{F6}\x{F8}\x{FC}\x{10D}\x{111}\x{144}\x{14B}\x{161}\x{167}\x{17E}]'
+
+# All valid category domains
+CAT_DOMAINS=$(${SOURCE_DIR}/get_norid_cat_domains)
+
+EXP_REGEXP=$(cat <<'EOF'
+(
+  (?:
+    # $x are all valid chars except - (hyphen)
+    # A normal domain, min 2 chars (neither -) with 0-61 chars (incl. -) in between
+    $x(?:$x|-){0,61}$x 
+    |
+    # $y are all category domain surrounded by (?:...)
+    # valid: x.<cat>.no and xx.<cat>.no, but not -.<cat>.no, -x.<cat>.no or x-.<cat>.no  
+    (?:
+      $x
+      |
+      $x(?:$x|-){0,61}$x
+    )\.$y
+  )
+  \.no
+)  
+(?!$x)
+EOF
+)
+
+# Remove comments, spaces and newlines from regexp
+REGEXP="$(echo "$EXP_REGEXP" | sed -e 's/#.*$//' -e 's/ //g' | tr -d '\n')"
+
+if [ -t 0 ] ; then 
+  if [ "$#" -ne 1 ]; then
+    echo "No STDIN input detected (non-terminal), and no file argument supplied"
+    exit 1;
+  fi
+  perl -CSD -e "open my \$in, \"$1\"; while(<\$in>) { \$x=qr/${VCHAR_EX_DASH}/i; \$y=qr/(?:${CAT_DOMAINS})/i; while(/${REGEXP}/gi) { print \$1,\"\\n\"; } } close(\$in);"
+else
+  perl -CSD -ne "\$x=qr/${VCHAR_EX_DASH}/i; \$y=qr/(?:${CAT_DOMAINS})/i; while(/${REGEXP}/gi) { print \$1,\"\\n\"; }"
+fi

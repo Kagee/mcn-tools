@@ -1,0 +1,7 @@
+#! /usr/bin/env python3
+import fileinput
+from urllib import parse
+
+for line in fileinput.input():
+    if len(line):
+        print(parse.unquote(line.strip()))
