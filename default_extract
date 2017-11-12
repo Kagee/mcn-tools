@@ -1,5 +1,6 @@
 #! /usr/bin/env bash
 SCRIPT_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
+# TODO: Rewrite to use parallel --jobs 7 -N 1000 --pipe "${MCN_TOOLS}/default_extract"
 if [ -t 0 ] ; then
     if [ "$#" -ne 1 ]; then
         echo "No STDIN input detected (non-terminal), and no file argument supplied"
