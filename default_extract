@@ -1,6 +1,5 @@
 #! /usr/bin/env bash
 SCRIPT_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
-# TODO: Rewrite to use parallel --jobs 7 -N 1000 --pipe "${MCN_TOOLS}/default_extract"
 if [ -t 0 ] ; then
     if [ "$#" -ne 1 ]; then
         echo "No STDIN input detected (non-terminal), and no file argument supplied"
@@ -10,5 +9,5 @@ if [ -t 0 ] ; then
     $SCRIPT_DIR/regexp_dotno "$1" | $SCRIPT_DIR/tolower | sort | uniq;
 else
     echo "INFO: Reading data from stdin." 1>&2
-    $SCRIPT_DIR/regexp_dotno | $SCRIPT_DIR/tolower | sort | uniq;
+    parallel --jobs 8 --pipe $SCRIPT_DIR/regexp_dotno | $SCRIPT_DIR/tolower | sort | uniq;
 fi
