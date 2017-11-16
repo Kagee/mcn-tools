@@ -8,6 +8,8 @@ SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Valid chars: 
 # https://www.norid.no/en/domeneregistrering/idn/idn_nyetegn/
+# TODO: Update this, missing i.e. ï
+# TODO: Use https://www.norid.no/en/regelverk/navnepolitikk/#link3
 VCHAR_EX_DASH='[a-z0-9\x{C5}\x{C6}\x{D8}\x{E0}\x{E1}\x{E4}-\x{EA}\x{F1}-\x{F4}\x{F6}\x{F8}\x{FC}\x{10D}\x{111}\x{144}\x{14B}\x{161}\x{167}\x{17E}]'
 
 # All valid category domains
