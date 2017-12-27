@@ -1,1 +1,5 @@
+# Testdata to trigger the following error in perl:
+# "Malformed UTF-8 character (fatal) at -e line 1, <> line 1."
+foobar|elg.no
 15b02|http://www.notebooksbilliger.de/forum/Netzwerk/Allgemeines/TL-SG1008D+-+TL-SG108+8-Port-Gigabit-Switch+gut+und+günstig+Oder+besser+DGS-1008D
+barfoo|ulv.no
