@@ -5,7 +5,7 @@ import sys
 import telnetlib
 import os
 import argparse
-import logging
+#import logging
 
 
 def get_non_ascii(prod):
@@ -65,17 +65,18 @@ def main():
         'Utility to print the chars and category domains allowed '
         'in a .no domain. Data can be from cache (default) or live data.'
     )
-    parser.add_argument(
-                      "-p",
-                      "--prod",
-                      help='Uses live data',
-                      action="store_true")
-  args = parser.parse_args()    
-production = False
-    pairs = get_non_ascii()
-    for pair in pairs:
-        print(pair[0], pair[1])
-    print(get_cat_domains(na))
+    parser.add_argument("-p", "--prod", help='Uses live data', action="store_true", default=False)
+    parser.add_argument("-c", "--chars", help='Print the valid non-ascii chars', action="store_true", default=False)
+    parser.add_argument("-d", "--domains", help='Print the valid category domains', action="store_true", default=False)
+    args = parser.parse_args()
+
+    if args.chars or args.domains:
+        pairs = get_non_ascii(args.prod)
+    if args.chars:
+        for pair in pairs:
+            print(pair[0], pair[1])
+    if args.domains:
+        print(get_cat_domains(pairs, args.prod))
 
 
 if __name__ == '__main__':
