@@ -1,6 +1,17 @@
 #! /usr/bin/env bash
 
 SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+if [ ! $(which idn) ]; then
+    echo "[ERROR] Could not find 'idn', exiting." 1>&2
+    exit 1
+fi
+
+if [ ! $(which nc) ]; then
+    echo "[ERROR] Could not find 'idn', exiting." 1>&2
+    exit 1
+fi
+
 WHOIS="${SOURCE_DIR}/NNRI4O-NORID.whois"
 
 if [ ! -e "${WHOIS}" ]; then
