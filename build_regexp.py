@@ -7,7 +7,7 @@ import os
 import argparse
 import logging
 from typing import Tuple, List
-
+import idna
 
 def get_non_ascii(prod: bool, python: bool):
     cachefile = os.path.abspath("navnepolitikk.txt")
@@ -87,6 +87,9 @@ def get_cat_domains(repl: List[Tuple[str, str]], prod: bool, tld: bool):
                 # Drop TLD (.no), 3 chars
                 domains[i[0]] = domains[i[0]][:-3]
             pre = domains[i[0]]
+            idn = idna.encode(pre).decode("utf-8")
+            if idn != pre:
+                pairs.append((pre, idn))
             for (q, t) in repl:
                 domains[i[0]] = domains[i[0]].replace(q, t)
             pairs.append((pre, domains[i[0]]))
