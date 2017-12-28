@@ -10,5 +10,5 @@ dotno = re.compile(r"""((?:[a-z0-9\xe0\xe1\xe4\xe5\xe6\xe7\xe8\xe9\xea\xef\xf1\x
 sys.stdin = codecs.getreader('utf8')(sys.stdin.detach(), errors='ignore')
 
 for line in sys.stdin:
-    for match in re.findall(dotno, line):
+    for match in dotno.findall(line):
         print(match)
