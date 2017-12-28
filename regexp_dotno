@@ -45,5 +45,5 @@ if [ -t 0 ] ; then
   fi
   perl -CSD -e "open my \$in, \"$1\"; while(<\$in>) { \$x=qr/${VCHAR_EX_DASH}/i; \$y=qr/(?:${CAT_DOMAINS})/i; while(/${REGEXP}/gi) { print \$1,\"\\n\"; } } close(\$in);"
 else
-  perl -CSD -ne "\$x=qr/${VCHAR_EX_DASH}/i; \$y=qr/(?:${CAT_DOMAINS})/i; while(/${REGEXP}/gi) { print \$1,\"\\n\"; }"
+  perl -CSD -ne "BEGIN { \$x=qr/${VCHAR_EX_DASH}/i; \$y=qr/(?:${CAT_DOMAINS})/i; } while(/${REGEXP}/goi) { print \$1,\"\\n\"; }"
 fi
