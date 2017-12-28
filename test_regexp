@@ -3,6 +3,12 @@ SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "${SOURCE_DIR}"
 
+if [ "x$1" == "x" ]; then
+	BIN="./regexp_dotno"
+else
+	BIN="$1"
+fi
+
 function err() { echo "$@" 1>&2; }
 
 
@@ -10,7 +16,7 @@ function err() { echo "$@" 1>&2; }
 function assert_equal_comp {
     IN="$1";
     EXPOUT="$2";
-    GOTOUT="$(echo "$IN" | ./regexp_dotno)";
+    GOTOUT="$(echo "$IN" | $BIN)";
     
     if [ "${EXPOUT}" != "${GOTOUT}" ]; then
         EXPLEN="$(echo -n "${EXPOUT}" | wc -c)"
@@ -28,7 +34,7 @@ function assert_equal {
 # Input that can not be cut to a valid domain returns nothing
 function assert_empty {
     IN="$1";
-    GOTOUT="$(echo "$IN" | ./regexp_dotno)";
+    GOTOUT="$(echo "$IN" | $BIN)";
     
     if [ "%" != "%${GOTOUT}" ]; then
         GOTLEN="$(echo -n "${GOTOUT}" | wc -c)"
