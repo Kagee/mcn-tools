@@ -92,6 +92,7 @@ def get_cat_domains(repl: List[Tuple[str, str]], prod: bool, tld: bool):
                 pairs.append((pre, idn))
             for (q, t) in repl:
                 domains[i[0]] = domains[i[0]].replace(q, t)
+
             pairs.append((pre, domains[i[0]]))
     else:
         logging.error("Failed to find regexp math in data.")
@@ -109,11 +110,13 @@ def build_regexp(prod: bool, python: bool):
     logging.debug("valid_chars_ex_dash: {}".format(valid_chars_ex_dash))
 
     domains = get_cat_domains(repl=chars, prod=prod, tld=False)
-    valid_cat_domains = "|".join([d[1] for d in domains])
+    valid_cat_domains = "(?:"
+    valid_cat_domains += "|".join([d[1] for d in domains])
+    valid_cat_domains += ")"
     logging.debug("valid_cat_domains: {}".format(valid_cat_domains))
 
-    # regexp = "((?:{0}(?:{0}|-){{0,61}}{0}|(?:{0}|{0}(?:{0}|-){{0,61}}{0})\.{1})\.no)(?!{0})"
-    regexp = "((?:{0}(?:{0}-){{0,61}}{0}|(?:{0}|{0}(?:{0}-){{0,61}}{0})\.{1})\.no)(?!{0})"
+    regexp = "((?:{0}(?:{0}|-){{0,61}}{0}|(?:{0}|{0}(?:{0}|-){{0,61}}{0})\.{1})\.no)(?!{0})"
+    #regexp = "((?:{0}(?:{0}-){{0,61}}{0}|(?:{0}|{0}(?:{0}-){{0,61}}{0})\.{1})\.no)(?!{0})"
     logging.debug('"{}".format(valid_chars_ex_dash, valid_cat_domains)'.format(regexp))
     print(regexp.format(valid_chars_ex_dash, valid_cat_domains))
 
