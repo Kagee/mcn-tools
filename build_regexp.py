@@ -10,6 +10,8 @@ from typing import Tuple, List
 import idna
 
 def get_non_ascii(prod: bool, python: bool):
+    old_cwd = os.getcwd()
+    os.chdir(os.path.dirname(os.path.realpath(__file__)))
     cachefile = os.path.abspath("navnepolitikk.txt")
     if prod:
         resource = urllib.request.urlopen(
@@ -22,15 +24,13 @@ def get_non_ascii(prod: bool, python: bool):
             except OSError as ose:
                 logging.warning("Failed to write cachefile ({}): {}".format(cachefile, ose))
     else:
-        old_cwd = os.getcwd()
-        os.chdir(os.path.dirname(os.path.realpath(__file__)))
         if os.path.isfile(cachefile):
             a_file = open(cachefile, encoding='utf-8')
             s = a_file.read()
         else:
             logging.error("Could not find {} in script dir. Run one with --prod to cache data.".format(cachefile))
             sys.exit(1)
-        os.chdir(old_cwd)
+    os.chdir(old_cwd)
 
     result = re.search('<a id="link3">(.*)<a id="link4">', s,
                        re.MULTILINE | re.DOTALL)
@@ -51,7 +51,9 @@ def get_non_ascii(prod: bool, python: bool):
 
 
 def get_cat_domains(repl: List[Tuple[str, str]], prod: bool, tld: bool):
-    cachefile = "whois.txt"
+    old_cwd = os.getcwd()
+    os.chdir(os.path.dirname(os.path.realpath(__file__)))
+    cachefile = os.path.abspath("whois.txt")
     if prod:
         whois = telnetlib.Telnet("whois.norid.no", 43)
         whois.write("-c utf-8 NNRI4O-NORID\n".encode('ascii'))
@@ -65,15 +67,13 @@ def get_cat_domains(repl: List[Tuple[str, str]], prod: bool, tld: bool):
             except OSError as ose:
                 logging.warning("Failed to write cachefile ({}): {}".format(cachefile, ose))
     else:
-        old_cwd = os.getcwd()
-        os.chdir(os.path.dirname(os.path.realpath(__file__)))
         if os.path.isfile(cachefile):
             a_file = open('whois.txt', encoding='utf-8')
             s = a_file.read()
         else:
             logging.error("Could not find {} in script dir. Run one with --prod to cache data.".format(cachefile))
             sys.exit(1)
-        os.chdir(old_cwd)
+    os.chdir(old_cwd)
 
     r = re.search('^Domains\.*: (.*)', s, re.MULTILINE)
     pairs = []
