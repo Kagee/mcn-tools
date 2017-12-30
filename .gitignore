@@ -2,3 +2,4 @@ NNRI4O-NORID.whois
 *.txt
 .idea/
 venv/
+__pycache__/
