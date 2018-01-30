@@ -9,5 +9,5 @@ if [ -t 0 ] ; then
     $SCRIPT_DIR/regexp_dotno "$1" | $SCRIPT_DIR/tolower | sort | uniq;
 else
     echo "INFO: Reading data from stdin." 1>&2
-    parallel --jobs 7 --pipe $SCRIPT_DIR/regexp_dotno | $SCRIPT_DIR/tolower | sort | uniq;
+    parallel --pipe $SCRIPT_DIR/regexp_dotno | $SCRIPT_DIR/tolower | sort | uniq;
 fi
