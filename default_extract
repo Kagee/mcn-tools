@@ -1,16 +1,19 @@
 #! /usr/bin/env bash
-SCRIPT_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
+SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$SOURCE_DIR"
+source config.sh
+
+command -v parallel >/dev/null 2>&1 || \
+    { echo >&2 "[ERROR] This script requires parallel but it's not installed. Aborting."; exit 1; }
 
 if [ -t 0 ] ; then
     if [ "$#" -ne 1 ]; then
-        echo "No STDIN input detected (non-terminal), and no file argument supplied"
+        echo >&2 "[ERROR] No STDIN input detected (non-terminal), and no file argument supplied"
         exit 1;
     fi
-    echo "INFO: Reading data from '$1'." 1>&2
-    $SCRIPT_DIR/regexp_dotno "$1" | $SCRIPT_DIR/tolower | sort | uniq;
+    echo >&2 "[INFO] Reading data from '$1'."
+    parallel -a "$1" --pipe $SCRIPT_DIR/regexp_dotno | $SCRIPT_DIR/tolower | sort | uniq;
 else
-    command -v parallel >/dev/null 2>&1 || \
-	{ echo >&2 "[INFO] This script requires parallel but it's not installed. Aborting."; exit 1; }
-    echo "INFO: Reading data from stdin." 1>&2
+    echo >&2 "[INFO] Reading data from stdin."
     parallel --pipe $SCRIPT_DIR/regexp_dotno | $SCRIPT_DIR/tolower | sort | uniq;
 fi
