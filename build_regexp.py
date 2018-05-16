@@ -7,7 +7,12 @@ import os
 import argparse
 import logging
 from typing import Tuple, List
-import idna
+try:
+    import idna
+except ImportError as ie:
+    print("[ERROR] {}".format(ie), file=sys.stderr)
+    print("[ERROR] Please run 'sudo apt-get install python3-idna'", file=sys.stderr)
+    sys.exit(1)
 
 def get_non_ascii(prod: bool, python: bool):
     old_cwd = os.getcwd()
@@ -22,13 +27,13 @@ def get_non_ascii(prod: bool, python: bool):
                 with open(cachefile, 'w', encoding="utf-8") as f:
                     f.write(s)
             except OSError as ose:
-                logging.warning("Failed to write cachefile ({}): {}".format(cachefile, ose))
+                logging.warning("[ERROR] Failed to write cachefile ({}): {}".format(cachefile, ose))
     else:
         if os.path.isfile(cachefile):
             a_file = open(cachefile, encoding='utf-8')
             s = a_file.read()
         else:
-            logging.error("Could not find {} in script dir. Run one with --prod to cache data.".format(cachefile))
+            logging.error("[ERROR] Could not find {} in script dir. Run one with --prod to cache data.".format(cachefile))
             sys.exit(1)
     os.chdir(old_cwd)
 
@@ -65,13 +70,13 @@ def get_cat_domains(repl: List[Tuple[str, str]], prod: bool, tld: bool):
                 with open(cachefile, 'w', encoding="utf-8") as f:
                     f.write(s)
             except OSError as ose:
-                logging.warning("Failed to write cachefile ({}): {}".format(cachefile, ose))
+                logging.error("[ERROR] Failed to write cachefile ({}): {}".format(cachefile, ose))
     else:
         if os.path.isfile(cachefile):
             a_file = open('whois.txt', encoding='utf-8')
             s = a_file.read()
         else:
-            logging.error("Could not find {} in script dir. Run one with --prod to cache data.".format(cachefile))
+            logging.error("[ERROR] Could not find {} in script dir. Run one with --prod to cache data.".format(cachefile))
             sys.exit(1)
     os.chdir(old_cwd)
 
