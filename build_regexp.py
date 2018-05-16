@@ -33,7 +33,7 @@ def get_non_ascii(prod: bool, python: bool):
             a_file = open(cachefile, encoding='utf-8')
             s = a_file.read()
         else:
-            logging.error("[ERROR] Could not find {} in script dir. Run one with --prod to cache data.".format(cachefile))
+            logging.error("[ERROR] Could not find {} in script dir. Run '{} --prod --chars' to cache data.".format(cachefile, __file__))
             sys.exit(1)
     os.chdir(old_cwd)
 
@@ -76,7 +76,7 @@ def get_cat_domains(repl: List[Tuple[str, str]], prod: bool, tld: bool):
             a_file = open('whois.txt', encoding='utf-8')
             s = a_file.read()
         else:
-            logging.error("[ERROR] Could not find {} in script dir. Run one with --prod to cache data.".format(cachefile))
+            logging.error("[ERROR] Could not find {} in script dir. Run '{} --prod --domains' to cache data.".format(cachefile,__file__))
             sys.exit(1)
     os.chdir(old_cwd)
 
