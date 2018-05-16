@@ -4,7 +4,9 @@ cd "$SOURCE_DIR"
 source config.sh
 
 command -v parallel >/dev/null 2>&1 || \
-    { echo >&2 "[ERROR] This script requires parallel but it's not installed. Aborting."; exit 1; }
+    { echo >&2 "[ERROR] This script requires parallel but it's not installed. Aborting."; 
+      echo >&2 "[ERROR] Please run 'sudo apt-get install parallel'";
+      exit 1; }
 
 if [ -t 0 ] ; then
     if [ "$#" -ne 1 ]; then
@@ -12,8 +14,8 @@ if [ -t 0 ] ; then
         exit 1;
     fi
     echo >&2 "[INFO] Reading data from '$1'."
-    parallel -a "$1" --pipe $SCRIPT_DIR/regexp_dotno | $SCRIPT_DIR/tolower | sort | uniq;
+    parallel --no-notice -a "$1" --pipe "$SOURCE_DIR/regexp_dotno" | "$SOURCE_DIR/tolower" | sort | uniq;
 else
     echo >&2 "[INFO] Reading data from stdin."
-    parallel --pipe $SCRIPT_DIR/regexp_dotno | $SCRIPT_DIR/tolower | sort | uniq;
+    parallel --no-notice --pipe "$SOURCE_DIR/regexp_dotno" | "$SOURCE_DIR/tolower" | sort | uniq;
 fi
