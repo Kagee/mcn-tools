@@ -1,5 +1,6 @@
 NNRI4O-NORID.whois
 *.txt
+*.swp
 .idea/
 venv/
 __pycache__/
