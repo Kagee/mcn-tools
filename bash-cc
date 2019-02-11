@@ -1,0 +1,47 @@
+#! /bin/bash
+# e: die if command returns with error, unless
+#    command if part of if/where/simmilar
+# u: erro out when expanding a undefined variable.
+#    use ${1:-} for possible numeric variables
+#  o pipefail: a pipeline’s return status is
+#              the value of the last (rightmost)
+#              command to exit with a non-zero
+#              status or 0
+set -euo pipefail
+
+# The relative path to the script this variable 
+# is expanded in.
+echo "${BASH_SOURCE[0]}"
+
+# If/while etc just checks the return code of it's 
+# arguemnt. the argument may be a command or 
+# multiple &&/|| together, or the test binary 
+# called with [ (see bash -c help test)
+
+if false; then
+  echo this is false
+# Using subshell as file descriptor
+elif grep -i PAT <(echo pattern); then
+  echo found pattern1
+fi
+
+# Redirecting a file (techincally subshell) to
+# stdin (echo PATTERN | grep ... is proably smarter)
+if grep PAT < <(echo PATTERN); then
+  echo found pattern2
+else
+  echo not found
+fi
+
+if false && [ "a" = "a" -a 1 -eq 1 ]; then
+  echo false \&\& true
+elif [ "a" = "a" -a 1 -eq 1 ] || false; then
+  echo true \&\& false
+elif (false && true) || true; then
+  echo return code of subshell \(false\) or true
+else
+  echo it\'s false
+fi
+
+# Find missing numbers (numbers in first column()
+awk '$1!=p+1{print p+1"-"$1-1}{p=$1}'
