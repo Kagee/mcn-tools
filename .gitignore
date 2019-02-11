@@ -6,3 +6,4 @@ venv/
 __pycache__/
 mcn-tools-norid-cat-domains/
 make-mcn/massdns
+make-mcn/jobs
