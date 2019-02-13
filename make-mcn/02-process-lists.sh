@@ -3,10 +3,19 @@
 # Start by setting up jobdir so we can start logging
 YMD="$(date +%F)"
 JOBDIR="./jobs/$YMD"
+if [ -d "$JOBDIR" ]; then
+  read -p "[WARNING] $JOBDIR exists. Do you want to delete? " -n 1 -r
+  echo    # (optional) move to a new line
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+      rm -r "$JOBDIR"
+  fi
+fi
+
 mkdir -p "$JOBDIR"
 
 PIPEFILE="$JOBDIR/log.pip"
-mkfifo "$PIPEFILE"
+rm $PIPEFILE 2>/dev/null || true
+mkfifo "$PIPEFILE" || exit
 
 # Start tee writing to a logfile, but pulling its input from our named pipe.
 tee "$JOBDIR/run.log" < $PIPEFILE &
@@ -29,10 +38,18 @@ else
 fi
 
 INPUT="$(cat 00-make-input.txt)"
+echo "$INPUT" > "$JOBDIR/input.txt"
 FILES="$(echo "$INPUT" | grep -o -P '[^\s]*\.list')"
 NUM_INPUT="$(echo "$FILES" | wc -l)"
 1>&2 echo "[INFO] There are $NUM_INPUT input files."
+1>&2 echo "[INFO] LINES   SOURCE"
+wc -l $(echo "$INPUT" | grep -o -P '[^\s]*\.list') | sed -e 's#/.*/##' | sort -gr | 1>&2 sed -e 's/^/[INFO]/'
 CREDITS="$(echo "$INPUT" | grep -F 'Credits:' | sed 's/Credits: *//')"
+SOURCES="$(echo "$INPUT" | grep -F 'Source:' | sed -e 's/^Source: \([^ ]*\) .*/\1/' | sort)"
+1>&2 echo "[INFO] Current sources: " $SOURCES
+echo "$FILES" > "$JOBDIR/files.txt"
+echo "$CREDITS" > "$JOBDIR/credits.txt"
+echo "$SOURCES" > "$JOBDIR/sources.txt"
 echo "$FILES" | xargs -L1 cat | sort > "$JOBDIR/full.list"
 
 # Calculate some pretty stats
@@ -79,6 +96,12 @@ cat "$JOBDIR/full_uniq.list" | parallel \
 1>&2 echo "[INFO] $(grep -c '.*' "$JOBDIR/full_uniq_post_idn.list") domains remains after idn normalization"
 
 source 03-run-massdns.sh
+
+1>&2 echo "[INFO] massdns run is complete. To re-run, run ./03-run-massdns.sh $JOBDIR"
+
+source 04-compare-to-norid.sh
+
+1>&2 echo "[INFO] Norid comapre is complete. To re-run, run ./04-compare-to-norid.sh $JOBDIR"
 
 # close the stderr and stdout file descriptors.
 exec 1>&- 2>&-
