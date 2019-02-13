@@ -78,6 +78,8 @@ cat "$JOBDIR/full_uniq.list" | parallel \
 1>&2 echo "[INFO] $(grep -c '.*' "$JOBDIR/idn.error") domains failed idn normalization (see $JOBDIR/idn.error)"
 1>&2 echo "[INFO] $(grep -c '.*' "$JOBDIR/full_uniq_post_idn.list") domains remains after idn normalization"
 
+source 03-run-massdns.sh
+
 # close the stderr and stdout file descriptors.
 exec 1>&- 2>&-
 
