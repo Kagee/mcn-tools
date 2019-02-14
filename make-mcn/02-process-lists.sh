@@ -38,7 +38,7 @@ else
   mkdir -p "$JOBDIR"
 fi
 
-INPUT="$(cat 00-make-input.txt)"
+INPUT="$(./00-make-input.sh)"
 echo "$INPUT" > "$JOBDIR/input.txt"
 FILES="$(echo "$INPUT" | grep -o -P '[^\s]*\.list')"
 NUM_INPUT="$(echo "$FILES" | wc -l)"
