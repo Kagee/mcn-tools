@@ -14,25 +14,27 @@ COMBINED="$JOBDIR/result_SOA_combined.txt"
 cat $INPUT_LIST | jq -r 'select(.status == "NOERROR") .name' | sort | uniq > "$COMBINED"
 
 URL_TOTAL="https://www.norid.no/en/statistikk/aktivedomener"
-FTOT="./aktivedomener"
+FTOT="./aktivedomener.html"
 #https://www.norid.no/en/statistikk/privtall/ #private REGISTRANT, not under .priv.no
 URL_IDN="https://www.norid.no/en/statistikk/idntall"
-FIDN="./idntall"
+FIDN="./idntall.html"
 
 
-if [ ! -f "$FTOT" ]; then
+#if [ ! -f "$FTOT" ]; then
+rm "$FTOT"  2>/dev/null || true
 wget -q -O "$FTOT" "$URL_TOTAL"
-else
-  1>&2 echo "[INFO] Found old $FTOT, using that. Delete to refresh."
-fi
+#else
+#  1>&2 echo "[INFO] Found old $FTOT, using that. Delete to refresh."
+#fi
 
 TOT="$(cat "$FTOT"| grep -P '\d\d\d\d-\d\d-\d\d' | head -1 | rev | cut -d';' -f -1 | rev)"
 
-if [ ! -f "$FIDN" ]; then
+#if [ ! -f "$FIDN" ]; then
+rm "$FIDN"  2>/dev/null || true
 wget -q -O "$FIDN" $URL_IDN
-else
-  1>&2 echo "[INFO] Found old $FIDN, using that. Delete to refresh."
-fi
+#else
+#  1>&2 echo "[INFO] Found old $FIDN, using that. Delete to refresh."
+#fi
 
 IDN="$(cat $FIDN | grep -P '\d\d\d\d-\d\d-\d\d' | head -1 | cut -d\; -f4 | cut -d\& -f 1)"
 
