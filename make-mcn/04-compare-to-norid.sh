@@ -10,10 +10,8 @@ if [ ! -d "$JOBDIR" ]; then
 fi
 
 INPUT_LIST="$(find $JOBDIR/ -name 'result_SOA.*.json')"
-
-1>&2 echo "[INFO] no know how make json to txt"
-
-exit 9
+COMBINED="$JOBDIR/result_SOA_combined.txt"
+cat $INPUT_LIST | jq -r 'select(.status == "NOERROR") .name' | sort | uniq > "$COMBINED"
 
 URL_TOTAL="https://www.norid.no/en/statistikk/aktivedomener"
 FTOT="./aktivedomener"
@@ -44,8 +42,8 @@ IDN="$(cat $FIDN | grep -P '\d\d\d\d-\d\d-\d\d' | head -1 | cut -d\; -f4 | cut -
 1>&2 echo "[INFO]   IDN Domains: $IDN"
 1>&2 echo ""
 
-ITOT="$(wc -l "$INPUT_LIST" | cut -d ' ' -f 1)"
-IIDN="$(grep "^xn--" "$INPUT_LIST" | wc -l | cut -d ' ' -f 1)"
+ITOT="$(wc -l "$COMBINED" | cut -d ' ' -f 1)"
+IIDN="$(grep "^xn--" "$COMBINED" | wc -l | cut -d ' ' -f 1)"
 
 1>&2 echo "[INFO] Input data:"
 1>&2 echo "[INFO]   Total domains: $ITOT"
@@ -63,10 +61,10 @@ DIDN="$( echo "$IDN - $IIDN" | bc)"
 1>&2 echo ""
 
 1>&2 echo "[INFO] Statistics:"
-1>&2 echo "[INFO]   Norske kommuner og herredskommuner (*.kommune.no, *.herad.no): $(grep -c -P '.*\.kommune\.no$|.*\.herad\.no$' "$INPUT_LIST")"
-1>&2 echo "[INFO]   Den norske stat og departementene (*.dep.no, *.stat.no): $(grep -c -P '.*\.dep\.no$|.*\.stat\.no$' "$INPUT_LIST")"
-1>&2 echo "[INFO]   Privatpersoner (*.priv.no): $(grep -c -P '.*\.priv\.no$' "$INPUT_LIST")"
-1>&2 echo "[INFO]   Folkehøgskoler og videregående skoler (*.fhs.no, *.vgs.no): $(grep -c -P '.*\.fhs\.no$|.*\.vgs\.no$' "$INPUT_LIST")"
-1>&2 echo "[INFO]   Fylkesbiblioteker og folkebiblioteker (*.fylkesbibl.no, *.folkebibl.no): $(grep -c -P '.*\.fylkesbibl\.no$|.*\.folkebibl\.no$' "$INPUT_LIST")"
-1>&2 echo "[INFO]   Museer (*.museum.no): $(grep -c -P '.*\.museum\.no$' "$INPUT_LIST")"
-1>&2 echo "[INFO]   Idrettsorganisasjoner (*.idrett.no): $(grep -c -P '.*\.idrett\.no$' "$INPUT_LIST")"
+1>&2 echo "[INFO]   Norske kommuner og herredskommuner (*.kommune.no, *.herad.no): $(grep -c -P '.*\.kommune\.no$|.*\.herad\.no$' "$COMBINED")"
+1>&2 echo "[INFO]   Den norske stat og departementene (*.dep.no, *.stat.no): $(grep -c -P '.*\.dep\.no$|.*\.stat\.no$' "$COMBINED")"
+1>&2 echo "[INFO]   Privatpersoner (*.priv.no): $(grep -c -P '.*\.priv\.no$' "$COMBINED")"
+1>&2 echo "[INFO]   Folkehøgskoler og videregående skoler (*.fhs.no, *.vgs.no): $(grep -c -P '.*\.fhs\.no$|.*\.vgs\.no$' "$COMBINED")"
+1>&2 echo "[INFO]   Fylkesbiblioteker og folkebiblioteker (*.fylkesbibl.no, *.folkebibl.no): $(grep -c -P '.*\.fylkesbibl\.no$|.*\.folkebibl\.no$' "$COMBINED")"
+1>&2 echo "[INFO]   Museer (*.museum.no): $(grep -c -P '.*\.museum\.no$' "$COMBINED")"
+1>&2 echo "[INFO]   Idrettsorganisasjoner (*.idrett.no): $(grep -c -P '.*\.idrett\.no$' "$COMBINED")"
