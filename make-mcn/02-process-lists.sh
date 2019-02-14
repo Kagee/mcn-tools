@@ -4,6 +4,7 @@
 YMD="$(date +%F)"
 JOBDIR="./jobs/$YMD"
 if [ -d "$JOBDIR" ]; then
+
   read -p "[WARNING] $JOBDIR exists. Do you want to delete? " -n 1 -r
   echo    # (optional) move to a new line
   if [[ $REPLY =~ ^[Yy]$ ]]; then
@@ -95,13 +96,13 @@ cat "$JOBDIR/full_uniq.list" | parallel \
 1>&2 echo "[INFO] $(grep -c '.*' "$JOBDIR/idn.error") domains failed idn normalization (see $JOBDIR/idn.error)"
 1>&2 echo "[INFO] $(grep -c '.*' "$JOBDIR/full_uniq_post_idn.list") domains remains after idn normalization"
 
-source 03-run-massdns.sh
+source 03-run-zdns.sh
 
-1>&2 echo "[INFO] massdns run is complete. To re-run, run ./03-run-massdns.sh $JOBDIR"
+1>&2 echo "[INFO] zdns run is complete. To re-run, run ./03-run-zdns.sh $JOBDIR"
 
 source 04-compare-to-norid.sh
 
-1>&2 echo "[INFO] Norid comapre is complete. To re-run, run ./04-compare-to-norid.sh $JOBDIR"
+1>&2 echo "[INFO] Norid compare is complete. To re-run, run ./04-compare-to-norid.sh $JOBDIR"
 
 # close the stderr and stdout file descriptors.
 exec 1>&- 2>&-
