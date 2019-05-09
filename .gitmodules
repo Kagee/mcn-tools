@@ -1,0 +1,3 @@
+[submodule "mcn-tools-norid-cat-domains"]
+	path = mcn-tools-norid-cat-domains
+	url = git@github.com:Kagee/mcn-tools-norid-cat-domains.git
